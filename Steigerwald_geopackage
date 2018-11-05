@@ -1,0 +1,28 @@
+packages <- c("ggplot2", "dplyr", "tidyverse", "RCurl", "rgdal", "sp")
+if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
+  install.packages(setdiff(packages, rownames(installed.packages())))  
+}
+
+WD <- getwd()
+if (!is.null(WD)) setwd("J:/RStudio/Task2")
+
+
+library(RCurl)
+library(tidyverse)
+library(sp)
+library(rgdal)
+
+### load table into dataframe
+df <- read.csv("https://raw.githubusercontent.com/wegmann/R_data/master/Steigerwald_sample_points_all_data_subset_withNames.csv",header=TRUE,sep=",")
+
+#df$S2.1[length((df$S2.1))-1]
+
+spdf.obj <- df  # initialize an spacial point data frame
+#names(spdf.obj)
+coordinates(spdf.obj) <- ~x+y  # set the coordinates of the SPDF
+proj4string(spdf.obj) <- CRS("+init=epsg:24383")  # set the coordinate system
+ 
+### export the SPDF into an shapefile and/or geopackage
+writeOGR(spdf.obj,"sample_point_with_data.gpkg", driver="GPKG", "data")
+writeOGR(spdf.obj,"sample_point_with_data.shp", driver="ESRI Shapefile", "data")
+  
